@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>score results</title> 
+    <link rel="stylesheet" href="static/score_results.css">  
+</head>
+<body>
+
+    <div class="container">
+        <!-- Profile Section (Home) -->
+        {% for scores_results in scores_results_lst %}
+        <div class="profile-container"> <!-- Wrapper for each profile -->
+            <div class="home-btn-container">
+                <div class="info-box">
+                    <div class="name-designation">
+                        <h1>{{ scores_results["Personal Details"]["Name"] }}</h1>
+                        <h4>{{ scores_results["Work Experience"][0]["Role"] }}</h4>
+                    </div>  
+                </div>
+                <div class="total-score-container">
+                    <h3>Score: {{ scores_results["Total Score"] }}</h3>
+                </div>
+            </div>
+            
+            <!-- Navigation Buttons for Each Profile -->
+            <div class="button-container">
+                <button class="btn" onclick="showSection('personal-details-{{ loop.index }}', this)">Personal Details</button>
+                <button class="btn" onclick="showSection('work-experience-{{ loop.index }}', this)">Work Experience</button>
+                <button class="btn" onclick="showSection('education-{{ loop.index }}', this)">Education</button>
+                <button class="btn" onclick="showSection('skills-{{ loop.index }}', this)">Skills</button>
+                <button class="btn" onclick="showSection('companies-worked-{{ loop.index }}', this)">Companies Worked</button>
+                <button class="btn" onclick="showSection('languages-known-{{ loop.index }}', this)">Languages Known</button>
+                <button class="btn" onclick="showSection('projects-{{ loop.index }}', this)">Projects</button>
+                <button class="btn" onclick="showSection('certifications-{{ loop.index }}', this)">Certifications</button>
+            </div>
+
+            <!-- Personal Details Section for Each Profile -->
+            <div id="personal-details-{{ loop.index }}" class="section">
+                <h2>Personal Details</h2>
+                <ul class="details">
+                    <li><strong>Name:</strong> {{ scores_results["Personal Details"]["Name"] }}</li>
+                    <li><strong>Email:</strong> {{ scores_results["Personal Details"]["Email"] }}</li>
+                    <li><strong>Phone:</strong> {{ scores_results["Personal Details"]["Phone"] }}</li>
+                    <li><strong>Address:</strong> {{ scores_results["Personal Details"]["Address"] }}</li>
+                    <li><strong>GitHub:</strong> {{ scores_results["Personal Details"]["GitHub"] }}</li>
+                    <li><strong>LinkedIn:</strong> {{ scores_results["Personal Details"]["LinkedIn"] }}</li>
+                    <li><strong>StackOverflow:</strong> {{ scores_results["Personal Details"]["StackOverflow"] }}</li>
+                    <li><strong>Leetcode:</strong> {{ scores_results["Personal Details"]["Leetcode"] }}</li>
+                </ul>
+            </div>
+
+            <!-- Work Experience Section for Each Profile -->
+            <div id="work-experience-{{ loop.index }}" class="section">
+                <h2>Work Experience</h2>
+                {% for work in scores_results["Work Experience"] %}
+                    <div>
+                        <h3>{{ work["Company"] }} - {{ work["Role"] }}</h3>
+                        <p><strong>Duration:</strong> {{ work["Duration"] }}</p>
+                        <p><strong>Job Description:</strong> {{ work["Job Description"] }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Additional Sections (Education, Skills, Companies, etc.) for Each Profile -->
+            <div id="education-{{ loop.index }}" class="section">
+                <h2>Education</h2>
+                {% for education in scores_results["Education"] %}
+                    <div>
+                        <p><strong>Degree:</strong> {{ education["Degree"] }}</p>
+                        <p><strong>Institution:</strong> {{ education["Institution"] }}</p>
+                        <p><strong>Duration:</strong> {{ education["Duration"] }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div id="skills-{{ loop.index }}" class="section">
+                <h2>Skills</h2>
+                <ul class="skills-list">
+                    {% for skill in scores_results["Skills"] %}
+                        <li>{{ skill }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div id="companies-worked-{{ loop.index }}" class="section">
+                <h2>Companies Worked</h2>
+                <ul class="companies-list">
+                    {% for company in scores_results["Companies Worked"] %}
+                        <li>{{ company }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div id="languages-known-{{ loop.index }}" class="section">
+                <h2>Languages Known</h2>
+                <p>
+                    {% if scores_results["Languages Known"] %}
+                        <ul>
+                            {% for language in scores_results["Languages Known"] %}
+                                <li>{{ language }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No languages listed</p>
+                    {% endif %}
+                </p>
+            </div>
+
+            <div id="projects-{{ loop.index }}" class="section">
+                <h2>Projects</h2>
+                {% for project in scores_results["Projects"] %}
+                    <div>
+                        <p><strong>Project Name:</strong> {{ project["Project Name"] }}</p>
+                        <p><strong>Description:</strong> {{ project["Description"] }}</p>
+                        <p><strong>Role:</strong> {{ project["Role"] }}</p>
+                        <p><strong>Duration:</strong> {{ project["Duration"] or "N/A" }}</p>
+                        <p><strong>Link:</strong> {{ project["Link"] or "N/A" }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div id="certifications-{{ loop.index }}" class="section">
+                <h2>Certifications</h2>
+                {% if scores_results["Certifications"] %}
+                    <ul>
+                        {% for certification in scores_results["Certifications"] %}
+                            <li>{{ certification }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No certifications listed</p>
+                {% endif %}
+            </div>
+
+        </div> <!-- End of profile-container -->
+        {% endfor %}
+    </div>
+
+    <script>
+        // Function to show/hide sections and toggle button color
+        function showSection(sectionId, button) {
+            let sectionToShow = document.getElementById(sectionId);
+            // Toggle visibility
+            if (sectionToShow.style.display === 'block') {
+                sectionToShow.style.display = 'none';
+                button.classList.remove('active');
+            } else {
+                sectionToShow.style.display = 'block';
+                button.classList.add('active');
+            }
+        }
+    </script>
+
+</body>
+</html>

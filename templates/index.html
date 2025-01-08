@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canary Resume Bazaar</title>
+    <link rel="stylesheet" href="static/index.css">
+    <script>
+        // Show file input when the upload area is clicked
+        function triggerFileInput() {
+            document.getElementById('file-input').click();
+        }
+
+        // Show "Extract" button and update file name when a file is selected
+        function fileSelected() {
+            const fileInput = document.getElementById('file-input');
+            const fileName = fileInput.files[0]?.name || '';
+            const extractButton = document.getElementById('extract-button');
+            const fileNameDisplay = document.getElementById('file-name');
+
+            if (fileName) {
+                fileNameDisplay.textContent = `Selected file: ${fileName}`;
+                extractButton.style.display = 'inline-block';  // Show Extract button
+            } else {
+                fileNameDisplay.textContent = '';
+                extractButton.style.display = 'none';  // Hide Extract button
+            }
+        }
+    </script>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>Resume Bazaar</h1>
+    </div>
+
+    <!-- Main Container for Resume Info and Upload Section -->
+    <div class="container">
+        <!-- Resume Info Section -->
+        <div class="resume-info">
+            <h1>The Most Advanced and Accurate AI Resume Parser 🚀</h1>
+            <p>Simplify your hiring process by using an advanced AI resume parser to extract key information from resumes instantly.</p>
+            <p>This tool ensures precise and structured data extraction, saving you time and effort in reviewing candidates.</p>
+            <h3>Steps to use our resume parsing software:</h3>
+            <ul>
+                <li><strong>1. Upload the Resume</strong></li>
+                <li class="arrow">→</li>
+                <li><strong>2. Extract Key Information</strong></li>
+                <li class="arrow">→</li>
+                <li><strong>3. Score Resumes Based on Criteria</strong></li>
+                <li class="arrow">→</li>
+                <li><strong>4. Auto-Shortlist Candidates</strong></li>
+                <li class="arrow">→</li>
+                <li><strong>5. Export and Review</strong></li>
+            </ul>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="upload-section" id="upload-section">
+            <h3>START PARSING NOW!</h3>
+            <div class="drag-drop" id="drag-drop-area" onclick="triggerFileInput()">
+                Click to upload a resume (PDF, DOC, DOCX)
+                <span>UPLOAD</span>
+            </div>
+            <form action="/" method="POST" enctype="multipart/form-data">
+                <input type="file" name="file" accept=".pdf,.doc,.docx" id="file-input" style="display: none;" onchange="fileSelected()">
+                <p id="file-name" style="font-size: 14px; color: #333; margin-top: 10px;"></p>
+
+                <button type="submit" id="extract-button" style="display: none;">Extract</button>
+            </form>
+
+            <p style="font-size: 14px; color: #777; margin-top: 15px;">
+                Supported formats: PDF, DOC, DOCX (maximum 5 files)
+            </p>
+        </div>
+
+        <!-- Display Extracted Text -->
+        <div id="extracted-text">
+            {% if extracted_data %}
+                <h3>Extracted Text:</h3>
+                <p>{{ extracted_data }}</p>
+            {% endif %}
+        </div>
+    </div> 
+</body>
+</html>
