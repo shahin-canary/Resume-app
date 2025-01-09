@@ -73,6 +73,11 @@ Provide the response in the following JSON structure:
 import json
 import PyPDF2 as pdf 
 import google.generativeai as genai 
+
+from sentence_transformers import SentenceTransformer 
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+
 def get_gemini_response(resume_text, input_prompt_template):
     input_prompt = input_prompt_template.format(resume=resume_text)
     genai.configure(api_key="AIzaSyCyh0yprRa2hbiuVTOkQMQgjxkW1J0OrTc")
@@ -91,13 +96,13 @@ def process_resume(input_prompt_template, resume_text):
     import json 
     attempt_count = 0
     max_retries = 5  # You can set the max retries to any value you prefer
+
     # Initialize gemini_response variable
     gemini_response = None
 
     while attempt_count < max_retries:
         gemini_response = get_gemini_response(resume_text, input_prompt_template)
-        print("Attempt", attempt_count + 1, "gemini_response: ", gemini_response)
-        
+        print("Attempt", attempt_count + 1, "gemini_response: ", gemini_response) 
         try:
             # Try to parse the response as JSON
             gemini_response_json = json.loads(gemini_response)
@@ -135,80 +140,155 @@ def process_resume(input_prompt_template, resume_text):
 
 
 
-from sentence_transformers import SentenceTransformer 
-from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
-# def calculate_similarity(jd_text, applicant_text):  
-#     model = SentenceTransformer('all-MiniLM-L6-v2')
-#     jd_embedding = model.encode([jd_text])
-#     applicant_embedding = model.encode([applicant_text])
-#     similarity_score = cosine_similarity([np.mean(jd_embedding, axis=0)], [np.mean(applicant_embedding, axis=0)])[0][0]
-#     return similarity_score
+# from sentence_transformers import SentenceTransformer 
+# from sklearn.metrics.pairwise import cosine_similarity
+# import numpy as np
+# # def calculate_similarity(jd_text, applicant_text):  
+# #     model = SentenceTransformer('all-MiniLM-L6-v2')
+# #     jd_embedding = model.encode([jd_text])
+# #     applicant_embedding = model.encode([applicant_text])
+# #     similarity_score = cosine_similarity([np.mean(jd_embedding, axis=0)], [np.mean(applicant_embedding, axis=0)])[0][0]
+# #     return similarity_score
   
-# jd_text = "Insert job description text here."
-# applicant_text = "Insert applicant's profile text here." 
+# # jd_text = "Insert job description text here."
+# # applicant_text = "Insert applicant's profile text here." 
 
-# similarity = calculate_similarity(jd_text, applicant_text)
-# print(f"Similarity between job description and applicant: {similarity}")
+# # similarity = calculate_similarity(jd_text, applicant_text)
+# # print(f"Similarity between job description and applicant: {similarity}")
 
 
  
-# def get_scores(gemini_responses_lst):
+# # def get_scores(gemini_responses_lst):
 
-#     def calculate_similarity(jd_text, applicant_text):  
-#         model = SentenceTransformer('all-MiniLM-L6-v2')
-#         jd_embedding = model.encode([jd_text])
-#         applicant_embedding = model.encode([applicant_text])
-#         similarity_score = cosine_similarity([np.mean(jd_embedding, axis=0)], [np.mean(applicant_embedding, axis=0)])[0][0]
-#         return similarity_score
+# #     def calculate_similarity(jd_text, applicant_text):  
+# #         model = SentenceTransformer('all-MiniLM-L6-v2')
+# #         jd_embedding = model.encode([jd_text])
+# #         applicant_embedding = model.encode([applicant_text])
+# #         similarity_score = cosine_similarity([np.mean(jd_embedding, axis=0)], [np.mean(applicant_embedding, axis=0)])[0][0]
+# #         return similarity_score
 
-#     for gemini_response in gemini_responses_lst:
-#         # Extracted data from resume
-#         skills = gemini_response["Skills"]
-#         languages = gemini_response["Languages Known"]
-#         education = gemini_response["Education"]
-#         resume_experience = gemini_response["Total Experience (in years)"]
+# #     for gemini_response in gemini_responses_lst:
+# #         # Extracted data from resume
+# #         skills = gemini_response["Skills"]
+# #         languages = gemini_response["Languages Known"]
+# #         education = gemini_response["Education"]
+# #         resume_experience = gemini_response["Total Experience (in years)"]
 
-#         # Job description data
-#         jd_skills = ["AI", "Machine Learning", "Deep Learning", "NLP", "HTML5", "React.js", "Redux", "Context API", "Next.js", "CSS3"]
-#         jd_languages = ["English", "Hindi", "Malayalam"]
-#         jd_education = " | ".join(["B.Tech in IT", "B.Tech in Computer Science", "MCA", "BCA", "M.Tech in Computer Science", "M.Tech in IT"])
-#         jd_experience = "3 to 5 years of experience"
+# #         # Job description data
+# #         jd_skills = ["AI", "Machine Learning", "Deep Learning", "NLP", "HTML5", "React.js", "Redux", "Context API", "Next.js", "CSS3"]
+# #         jd_languages = ["English", "Hindi", "Malayalam"]
+# #         jd_education = " | ".join(["B.Tech in IT", "B.Tech in Computer Science", "MCA", "BCA", "M.Tech in Computer Science", "M.Tech in IT"])
+# #         jd_experience = "3 to 5 years of experience"
 
-#         # Calculate skills similarity
-#         skills_str = " | ".join(skills)
-#         jd_skills_str = " | ".join(jd_skills)
-#         skills_similarity = calculate_similarity(skills_str, jd_skills_str)
+# #         # Calculate skills similarity
+# #         skills_str = " | ".join(skills)
+# #         jd_skills_str = " | ".join(jd_skills)
+# #         skills_similarity = calculate_similarity(skills_str, jd_skills_str)
 
-#         # Calculate language similarity if resume has languages
-#         if languages:
-#             languages_str = " | ".join(languages)
-#             jd_languages_str = " | ".join(jd_languages)
-#             language_similarity = calculate_similarity(languages_str, jd_languages_str)
-#         else:
-#             language_similarity = 0
+# #         # Calculate language similarity if resume has languages
+# #         if languages:
+# #             languages_str = " | ".join(languages)
+# #             jd_languages_str = " | ".join(jd_languages)
+# #             language_similarity = calculate_similarity(languages_str, jd_languages_str)
+# #         else:
+# #             language_similarity = 0
 
-#         # Calculate education similarity
-#         education_list = [edu["Degree"] for edu in education if edu["Degree"]]
-#         education_similarity_scores = [calculate_similarity(jd_education, edu) for edu in education_list]
-#         average_education_similarity = sum(education_similarity_scores) / len(education_similarity_scores) if education_similarity_scores else 0
+# #         # Calculate education similarity
+# #         education_list = [edu["Degree"] for edu in education if edu["Degree"]]
+# #         education_similarity_scores = [calculate_similarity(jd_education, edu) for edu in education_list]
+# #         average_education_similarity = sum(education_similarity_scores) / len(education_similarity_scores) if education_similarity_scores else 0
 
-#         # Calculate experience similarity
-#         experience_similarity = calculate_similarity(jd_experience, resume_experience)
+# #         # Calculate experience similarity
+# #         experience_similarity = calculate_similarity(jd_experience, resume_experience)
 
-#         # Combine all the scores into a dictionary with two digits after the decimal point
-#         scores = {
-#             "skills_score": round(skills_similarity * 100, 2),
-#             "language_score": round(language_similarity * 100, 2),
-#             "education_score": round(average_education_similarity * 100, 2),
-#             "experience_score": round(experience_similarity * 100, 2)
-#         }
+# #         # Combine all the scores into a dictionary with two digits after the decimal point
+# #         scores = {
+# #             "skills_score": round(skills_similarity * 100, 2),
+# #             "language_score": round(language_similarity * 100, 2),
+# #             "education_score": round(average_education_similarity * 100, 2),
+# #             "experience_score": round(experience_similarity * 100, 2)
+# #         }
 
-#         gemini_response["scores"] = scores     
-#         gemini_response["Total Score"] = "51" 
+# #         gemini_response["scores"] = scores     
+# #         gemini_response["Total Score"] = "51" 
 
-#     scores_results = gemini_responses_lst
-#     return scores_results
+# #     scores_results = gemini_responses_lst
+# #     return scores_results
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# main_required_keys = [
+#     "personal_details",
+#     "total_work_experience",
+#     "current_designation",
+#     "work_experience",
+#     "education",
+#     "skills",
+#     "companies_worked",
+#     "languages_known",
+#     "projects",
+#     "certifications",
+#     "scores",  
+#     "total_score"
+# ] 
+# scores_required_keys = [
+#     "education_scores_dict",
+#     "skills_scores_dict",
+#     "language_scores_dict",
+#     "experience_scores_dict",
+#     "skills_final_score",
+#     "language_final_score",
+#     "experience_final_score",
+#     "education_final_score",
+#     "total_score"
+# ]
+ 
+# def remove_nulls(d):
+#     if isinstance(d, dict):
+#         return {k: remove_nulls(v) for k, v in d.items() if v != 'null' and v is not None}
+#     elif isinstance(d, list):
+#         return [remove_nulls(i) for i in d if i != 'null' and i is not None]
+#     else:
+#         return d
+ 
+# def check_main_keys(data, required_keys, nested_key=None):
+#     missing_keys = []
+#     if nested_key: 
+#         nested_data = data.get(nested_key, {})
+#         missing_keys = [key for key in required_keys if key not in nested_data]
+#     else:
+#         # If checking top-level keys
+#         missing_keys = [key for key in required_keys if key not in data]
+#     if missing_keys:
+#         return False, missing_keys
+#     return True, []
+ 
+# cleaned_json = remove_nulls(my_json) 
+# try: 
+#     for entry in cleaned_json: 
+#         is_valid, missing_keys = check_main_keys(entry, main_required_keys)
+#         if not is_valid:
+#             raise ValueError(f"Missing main keys in entry: {missing_keys}") 
+#         is_valid, missing_scores_keys = check_main_keys(entry, scores_required_keys, nested_key="scores")
+#         if not is_valid:
+#             raise ValueError(f"Missing keys in 'scores': {missing_scores_keys}") 
+#     print("All required keys, including nested keys, are present.")
+# except ValueError as e:
+#     print(f"Validation error: {e}")
+
+
+
 
 
 

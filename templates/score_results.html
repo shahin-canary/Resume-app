@@ -6,7 +6,11 @@
     <title>score results</title> 
     <link rel="stylesheet" href="static/score_results.css">  
 </head>
-<body>
+<body> 
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>Resume Bazaar</h1>
+    </div>
 
     <div class="container">
         <!-- Profile Section (Home) -->
@@ -15,12 +19,12 @@
             <div class="home-btn-container">
                 <div class="info-box">
                     <div class="name-designation">
-                        <h1>{{ scores_results["Personal Details"]["Name"] }}</h1>
-                        <h4>{{ scores_results["Work Experience"][0]["Role"] }}</h4>
+                        <h1>{{ scores_results["personal_details"]["name"] }}</h1>
+                        <h4>{{ scores_results["current_designation"] }}</h4>
                     </div>  
                 </div>
                 <div class="total-score-container">
-                    <h3>Score: {{ scores_results["Total Score"] }}</h3>
+                    <h3>Score: {{ scores_results["total_score"] }}</h3>
                 </div>
             </div>
             
@@ -40,25 +44,25 @@
             <div id="personal-details-{{ loop.index }}" class="section">
                 <h2>Personal Details</h2>
                 <ul class="details">
-                    <li><strong>Name:</strong> {{ scores_results["Personal Details"]["Name"] }}</li>
-                    <li><strong>Email:</strong> {{ scores_results["Personal Details"]["Email"] }}</li>
-                    <li><strong>Phone:</strong> {{ scores_results["Personal Details"]["Phone"] }}</li>
-                    <li><strong>Address:</strong> {{ scores_results["Personal Details"]["Address"] }}</li>
-                    <li><strong>GitHub:</strong> {{ scores_results["Personal Details"]["GitHub"] }}</li>
-                    <li><strong>LinkedIn:</strong> {{ scores_results["Personal Details"]["LinkedIn"] }}</li>
-                    <li><strong>StackOverflow:</strong> {{ scores_results["Personal Details"]["StackOverflow"] }}</li>
-                    <li><strong>Leetcode:</strong> {{ scores_results["Personal Details"]["Leetcode"] }}</li>
+                    <li><strong>Name:</strong> {{ scores_results["personal_details"]["name"] }}</li>
+                    <li><strong>Email:</strong> {{ scores_results["personal_details"]["email"] }}</li>
+                    <li><strong>Phone:</strong> {{ scores_results["personal_details"]["phone"] }}</li>
+                    <li><strong>Address:</strong> {{ scores_results["personal_details"]["address"] }}</li>
+                    <li><strong>GitHub:</strong> {{ scores_results["personal_details"]["gitHub"] }}</li>
+                    <li><strong>LinkedIn:</strong> {{ scores_results["personal_details"]["linked_in"] }}</li>
+                    <li><strong>StackOverflow:</strong> {{ scores_results["personal_details"]["stack_overflow"] }}</li>
+                    <li><strong>Leetcode:</strong> {{ scores_results["personal_details"]["leetcode"] }}</li>
                 </ul>
             </div>
 
             <!-- Work Experience Section for Each Profile -->
             <div id="work-experience-{{ loop.index }}" class="section">
                 <h2>Work Experience</h2>
-                {% for work in scores_results["Work Experience"] %}
+                {% for work in scores_results["work_experience"] %}
                     <div>
-                        <h3>{{ work["Company"] }} - {{ work["Role"] }}</h3>
-                        <p><strong>Duration:</strong> {{ work["Duration"] }}</p>
-                        <p><strong>Job Description:</strong> {{ work["Job Description"] }}</p>
+                        <h3>{{ work["company"] }} - {{ work["role"] }}</h3>
+                        <p><strong>Duration:</strong> {{ work["duration"] }}</p>
+                        <p><strong>Job Description:</strong> {{ work["job_description"] }}</p>
                     </div>
                 {% endfor %}
             </div>
@@ -66,11 +70,11 @@
             <!-- Additional Sections (Education, Skills, Companies, etc.) for Each Profile -->
             <div id="education-{{ loop.index }}" class="section">
                 <h2>Education</h2>
-                {% for education in scores_results["Education"] %}
-                    <div>
-                        <p><strong>Degree:</strong> {{ education["Degree"] }}</p>
-                        <p><strong>Institution:</strong> {{ education["Institution"] }}</p>
-                        <p><strong>Duration:</strong> {{ education["Duration"] }}</p>
+                {% for education in scores_results["education"] %}
+                    <div  class="underline">
+                        <p><strong>Degree:</strong> {{ education["degree"] }}</p>
+                        <p><strong>Institution:</strong> {{ education["institution"] }}</p>
+                        <p><strong>Duration:</strong> {{ education["duration"] }}</p>
                     </div>
                 {% endfor %}
             </div>
@@ -78,16 +82,29 @@
             <div id="skills-{{ loop.index }}" class="section">
                 <h2>Skills</h2>
                 <ul class="skills-list">
-                    {% for skill in scores_results["Skills"] %}
+                    {% for skill in scores_results["skills"] %}
                         <li>{{ skill }}</li>
                     {% endfor %}
                 </ul>
+            </div>
+ 
+            <div id="projects-{{ loop.index }}" class="section">
+                <h2>Projects</h2>
+                {% for project in scores_results["projects"] %}
+                    <div class="underline">
+                        <p><strong>Project Name:</strong> {{ project["project_name"] }}</p>
+                        <p><strong>Description:</strong> {{ project["description"] }}</p>
+                        <p><strong>Role:</strong> {{ project["role"] }}</p>
+                        <p><strong>Duration:</strong> {{ project["duration"] or "N/A" }}</p>
+                        <p><strong>Link:</strong> {{ project["link"] or "N/A" }}</p>
+                    </div>
+                {% endfor %}
             </div>
 
             <div id="companies-worked-{{ loop.index }}" class="section">
                 <h2>Companies Worked</h2>
                 <ul class="companies-list">
-                    {% for company in scores_results["Companies Worked"] %}
+                    {% for company in scores_results["companies_worked"] %}
                         <li>{{ company }}</li>
                     {% endfor %}
                 </ul>
@@ -96,9 +113,9 @@
             <div id="languages-known-{{ loop.index }}" class="section">
                 <h2>Languages Known</h2>
                 <p>
-                    {% if scores_results["Languages Known"] %}
+                    {% if scores_results["languages_known"] %}
                         <ul>
-                            {% for language in scores_results["Languages Known"] %}
+                            {% for language in scores_results["languages_known"] %}
                                 <li>{{ language }}</li>
                             {% endfor %}
                         </ul>
@@ -106,26 +123,13 @@
                         <p>No languages listed</p>
                     {% endif %}
                 </p>
-            </div>
-
-            <div id="projects-{{ loop.index }}" class="section">
-                <h2>Projects</h2>
-                {% for project in scores_results["Projects"] %}
-                    <div>
-                        <p><strong>Project Name:</strong> {{ project["Project Name"] }}</p>
-                        <p><strong>Description:</strong> {{ project["Description"] }}</p>
-                        <p><strong>Role:</strong> {{ project["Role"] }}</p>
-                        <p><strong>Duration:</strong> {{ project["Duration"] or "N/A" }}</p>
-                        <p><strong>Link:</strong> {{ project["Link"] or "N/A" }}</p>
-                    </div>
-                {% endfor %}
-            </div>
+            </div> 
 
             <div id="certifications-{{ loop.index }}" class="section">
                 <h2>Certifications</h2>
-                {% if scores_results["Certifications"] %}
+                {% if scores_results["certifications"] %}
                     <ul>
-                        {% for certification in scores_results["Certifications"] %}
+                        {% for certification in scores_results["certifications"] %}
                             <li>{{ certification }}</li>
                         {% endfor %}
                     </ul>

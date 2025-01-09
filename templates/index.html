@@ -64,14 +64,13 @@
             </div>
             <form action="/" method="POST" enctype="multipart/form-data">
                 <input type="file" name="file" accept=".pdf,.doc,.docx" id="file-input" style="display: none;" onchange="fileSelected()">
-                <p id="file-name" style="font-size: 14px; color: #333; margin-top: 10px;"></p>
+                <p style="font-size: 12px; color: #777; margin-top:  10px;">
+                    Supported formats: PDF, DOC, DOCX
+                </p>
+                <p id="file-name" style="font-size: 14px; color: #7438ff; margin-top: 10px;"></p>
 
                 <button type="submit" id="extract-button" style="display: none;">Extract</button>
-            </form>
-
-            <p style="font-size: 14px; color: #777; margin-top: 15px;">
-                Supported formats: PDF, DOC, DOCX (maximum 5 files)
-            </p>
+            </form> 
         </div>
 
         <!-- Display Extracted Text -->
