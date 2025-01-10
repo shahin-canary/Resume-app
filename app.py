@@ -4,8 +4,9 @@ from werkzeug.utils import secure_filename
 import PyPDF2
 import docx
 
-from main import process_resume, input_prompt_template
-from main import get_scores
+from main import get_gemini_response, input_prompt_template
+from main import get_scores, validate_and_clean
+
 
 # Flask app setup
 app = Flask(__name__)
@@ -64,134 +65,331 @@ def index():
 
 @app.route('/score_results')
 def score_results():
-    # extracted_resume_text = request.args.get('extracted_resume_text', '') 
-    # gemini_responses_lst = process_resume(input_prompt_template, extracted_resume_text) 
-  
-  
 
-
-    gemini_responses_lst22222 = [
-        {
-            "personal_details": {
-                "name": "Jaya Chandra",
-                "email": "jaichandraios@gmail.com",
-                "phone": "+918886916516",
-                "address": 'null',#
-                "gitHub": 'null',#
-                "linked_in": "null",#
-                "stack_overflow": "null",#
-                "leetcode": "null"#
-            },
-            "total_work_experience": "4.2",
-            "current_designation": "Software Engineer",
-            "work_experience": [
-                {
-                    "company": "Innominds",
-                    "role": "Software Engineer",
-                    "job_description": "Fixed UI bugs which were reported by the Testing team.\nCollaborate with back-end developers for the REST API Integration.\nCreating and modifying React components.\nEnvironment / Technologies:\nHTML, CSS, TypeScript, React js,Redux and Fluent UI",
-                    "duration": "January 2022 \u2013 till date"
-                },
-                {
-                    "company": "Innominds",
-                    "role": "Software Engineer",
-                    "job_description": "Developed components for accessing PDF File using Fluent UI.\nFixed bugs for the already developed UI Components.\nResolving the PR comments and making changes as per Microsoft standards.\nEnvironment / Technologies:\nHTML, CSS, TypeScript and Fluent UI",
-                    "duration": "Designation:"
-                }
-            ],
-            "education": [
-                {
-                    "degree": "B.Tech",
-                    "institution": "Hasvita Institute of Engineering and Technology Hyderabad IN",
-                    "duration": "May 2016"
-                },
-                {
-                    "degree": "BCA",
-                    "institution": "Hasvita Institute of Engineering and Technology Hyderabad IN",
-                    "duration": "May 2016"
-                }
-            ],
-            "skills": [
-                "HTML5",
-                "CSS3",
-                "SCSS",
-                "Material UI",
-                "Fluent UI",
-                "JavaScript",
-                "TypeScript",
-                "React JS",
-                "Redux",
-                "RESTful APIs",
-                "Version Control tools like GIT Gitlab and GitHub",
-                "Bug tracking tools like JIRA and Redmine",
-                "Responsive & Interactive websites",
-                "Pixel Perfect documentation"
-            ],
-            "companies_worked": [
-                "Innominds",
-                "MIHY Innovations",
-                "WalkingTree Technologies Pvt. Ltd"
-            ],
-            "languages_known": ["English", "Hindi"],
-            "projects": [
-                {
-                    "project_name": "SigmaPlot NG",
-                    "description": "SigmaPlot NG Cloudification is a proprietary software package for scientific graphing and data analysis. It runs on a web browser. The software can read multiple formats, such as Microsoft Excel spreadsheets, and can also perform mathematical transforms and statistical analyses.",
-                    "role": "Software Engineer",
-                    "duration": "null",#
-                    "link": "null"#
-                },
-                {
-                    "project_name": "SigmaPlot NG",
-                    "description": "SigmaPlot NG Cloudification is a proprietary software package for scientific graphing and data analysis. It runs on a web browser. The software can read multiple formats, such as Microsoft Excel spreadsheets, and can also perform mathematical transforms and statistical analyses.",
-                    "role": "Software Engineer",
-                    "duration": "null",#
-                    "link": "null"#
-                }
-            ],
-            "certifications": ["Udemy"],
-            "scores" : {
-                        'education_scores_dict': 
-                            {
-                            'PhD in Computer Science': 65,
-                            'MTech. in Computer Science': 12,
-                            'BTech. in Computer Science': 96
-                            },  
-                        'skills_scores_dict': 
-                            {
-                            'HTML5': 63,
-                            'CSS3': 13,
-                            'JavaScript': 43
-                            }, 
-                        'language_scores_dict':
-                            {
-                            "English":11,
-                            "Hindi":32 
-                            },
-                        'experience_scores_dict':
-                            {
-                            "3 to 5 years of experience": 10,
-                            "5 to 7 years of experience": 10,
-                            "7 to 10 years of experience": 10 
-                            },
-                        'skills_final_score': "43.0",
-                        'language_final_score': "23.0",
-                        'experience_final_score': "53.0",
-                        'education_final_score': "12.0",
-                        'total_score': "46"
-                        },
-            "final_score" : "46"
-        }]
+    # # JD INPUTS 
+    jd_educations_lst = ["B.Tech in IT", "B.Tech in Computer Science", "MCA", "BCA", "M.Tech in Computer Science", "M.Tech in IT"]  
+    # jd_skills_lst = ["AI", "Machine Learning", "Deep Learning", "React.js"] 
+    jd_skills_lst = ["Python Django",
+            "CSS",
+            "MySQL",
+            "HTML",
+            "Inter Personality Skills",
+            "Time management",
+            "Hard Working",
+            "Quick Learner"]
     
+    jd_designation = "AI Developer"  
+    jd_Languages_lst = ["English", "Hindi", "Malayalam"] 
+    jd_data = {"jd_designation":jd_designation, "jd_educations_lst": jd_educations_lst, "jd_skills_lst": jd_skills_lst, "jd_Languages_lst": jd_Languages_lst }
+  
+
+ 
+    import json
+    extracted_resume_text = request.args.get('extracted_resume_text', '')   
+    # gemini_responses = get_gemini_response(extracted_resume_text, input_prompt_template) 
+     
+      
+    # import time 
+    # def get_valid_json_response(extracted_resume_text, input_prompt_template, max_retries=5, delay=2):
+    #     attempts = 0
+    #     while attempts < max_retries:
+    #         gemini_responses = get_gemini_response(extracted_resume_text, input_prompt_template)
+    #         print(f"Attempt {attempts + 1} - gemini_responses: {gemini_responses}")
+            
+    #         # Check if the response is non-empty and looks like JSON
+    #         if gemini_responses.strip() and gemini_responses.strip().startswith("{"):
+    #             try:
+    #                 # Attempt to parse the response
+    #                 gemini_responses_lst = json.loads(gemini_responses)
+    #                 print("Valid JSON received.")
+    #                 return gemini_responses_lst
+    #             except json.JSONDecodeError as e:
+    #                 print(f"Error decoding JSON on attempt {attempts + 1}: {e}")
+    #         else:
+    #             print(f"Attempt {attempts + 1}: Invalid or empty response.")
+            
+    #         attempts += 1
+    #         time.sleep(delay)
+
+    #     print("Max retries reached. No valid JSON response.")
+    #     return None
+
+
+    # # Now call the function to get a valid JSON response
+    # gemini_responses_lst = get_valid_json_response(extracted_resume_text, input_prompt_template)
+
+    # if gemini_responses_lst is not None:
+    #     print("gemini_responses_lst: ", gemini_responses_lst)
+    # else:
+    #     print("Failed to get a valid JSON response after multiple attempts.")
 
 
 
-    # print("gemini_responses_lst : ", gemini_responses_lst)
-    # scores_results_lst = get_scores(gemini_responses_lst)
-    # print("scores_results :  ",scores_results_lst) 
+    null ="null"
+    gemini_responses_lst = [{
+        "personal_details": {
+            "name": "ABHIJITH A",
+            "designation": null,
+            "email": "abhijith02003@gmail.com",
+            "phone": "+91 9847038539",
+            "address": "Anilnivas, Pambra colony, Pambra, Pulikkamally P.O Ernakulam",
+            "location": null,
+            "gitHub": null,
+            "linkedin": null,
+            "stackoverflow": null,
+            "leetcode": null
+        },
+        "total_work_experience": null,
+        "current_designation": "web developer",
+        "work_experience": [
+            {
+                "company": "Nosce Techno Solution",
+                "role": null,
+                "job_description": "Internship in PHP",
+                "duration": null,
+                "total_work_years": null
+            }, 
+        ],
+        "education": [
+            {
+                "degree": "BCA",
+                "institution": "Nirmala Arts and Science College, Mulanthuruthy",
+                "duration": "2020-2023",
+                "total_completion_years": 3
+            }
+        ],
+        "skills": [
+            "Python Django",
+            "CSS",
+        ],
+        "companies_worked": [
+            "Nosce Techno Solution",
+            "Zion IT Company Software and Networking",
+            "Luminar Technolub"
+        ],
+        "languages_known": [
+            "English",
+            "Malayalam"
+        ],
+        "projects": [
+            {
+                "project_name": "Smart attendance System Using Face Recognition",
+                "description": null,
+                "role": null,
+                "duration": null,
+                "link": null
+            },
+            {
+                "project_name": "Job Placement System",
+                "description": null,
+                "role": null,
+                "duration": null,
+                "link": null
+            },
+            {
+                "project_name": "Flight Management System For Indian Coast Guard",
+                "description": null,
+                "role": null,
+                "duration": null,
+                "link": null
+            }
+        ],
+        "certifications": []
+    },
+    {
+        "personal_details": {
+            "name": "ABHIJITH C",
+            "designation": null,
+            "email": "abhijith02003@gmail.com",
+            "phone": "+91 9847038539",
+            "address": "Anilnivas, Pambra colony, Pambra, Pulikkamally P.O Ernakulam",
+            "location": null,
+            "gitHub": null,
+            "linkedin": null,
+            "stackoverflow": null,
+            "leetcode": null
+        },
+        "total_work_experience": null,
+        "current_designation": "web developer",
+        "work_experience": [
+            {
+                "company": "Nosce Techno Solution",
+                "role": null,
+                "job_description": "Internship in PHP",
+                "duration": null,
+                "total_work_years": null
+            }, 
+        ],
+        "education": [
+            {
+                "degree": "BCA",
+                "institution": "Nirmala Arts and Science College, Mulanthuruthy",
+                "duration": "2020-2023",
+                "total_completion_years": 3
+            }, 
+            {
+                "degree": "SSLC",
+                "institution": "St Jude E M HSS Karnakodam",
+                "duration": null,
+                "total_completion_years": null
+            }
+        ],
+        "skills": [
+            "Python Django",
+            "CSS",
+            "MySQL",
+            "HTML", 
+        ],
+        "companies_worked": [
+            "Nosce Techno Solution",
+            "Zion IT Company Software and Networking",
+            "Luminar Technolub"
+        ],
+        "languages_known": [
+            "English",
+            "Malayalam"
+        ],
+        "projects": [
+            {
+                "project_name": "Smart attendance System Using Face Recognition",
+                "description": null,
+                "role": null,
+                "duration": null,
+                "link": null
+            },
+            {
+                "project_name": "Job Placement System",
+                "description": null,
+                "role": null,
+                "duration": null,
+                "link": null
+            },
+            {
+                "project_name": "Flight Management System For Indian Coast Guard",
+                "description": null,
+                "role": null,
+                "duration": null,
+                "link": null
+            }
+        ],
+        "certifications": []
+    },
+    {
+        "personal_details": {
+            "name": "ABHIJITH B",
+            "designation": null,
+            "email": "abhijith02003@gmail.com",
+            "phone": "+91 9847038539",
+            "address": "Anilnivas, Pambra colony, Pambra, Pulikkamally P.O Ernakulam",
+            "location": null,
+            "gitHub": null,
+            "linkedin": null,
+            "stackoverflow": null,
+            "leetcode": null
+        },
+        "total_work_experience": null,
+        "current_designation": null,
+        "work_experience": [
+            {
+                "company": "Nosce Techno Solution",
+                "role": null,
+                "job_description": "Internship in PHP",
+                "duration": null,
+                "total_work_years": null
+            },
+            {
+                "company": "Zion IT Company Software and Networking",
+                "role": null,
+                "job_description": "Internship in Python",
+                "duration": null,
+                "total_work_years": null
+            },
+            {
+                "company": "Luminar Technolub",
+                "role": null,
+                "job_description": "Internship Course in Python Django",
+                "duration": null,
+                "total_work_years": null
+            }
+        ],
+        "education": [
+            {
+                "degree": "BCA",
+                "institution": "Nirmala Arts and Science College, Mulanthuruthy",
+                "duration": "2020-2023",
+                "total_completion_years": 3
+            },
+            {
+                "degree": "PLUS TWO",
+                "institution": "Darul Uloom HSS, Pullepady",
+                "duration": null,
+                "total_completion_years": null
+            },
+            {
+                "degree": "SSLC",
+                "institution": "St Jude E M HSS Karnakodam",
+                "duration": null,
+                "total_completion_years": null
+            }
+        ],
+        "skills": [
+            "Python Django",
+            "CSS",
+            "MySQL",
+            "HTML",
+            "Inter Personality Skills",
+            "Time management",
+            "Hard Working",
+            "Quick Learner"
+        ],
+        "companies_worked": [
+            "Nosce Techno Solution",
+            "Zion IT Company Software and Networking",
+            "Luminar Technolub"
+        ],
+        "languages_known": [
+            "English",
+            "Malayalam"
+        ],
+        "projects": [
+            {
+                "project_name": "Smart attendance System Using Face Recognition",
+                "description": null,
+                "role": null,
+                "duration": null,
+                "link": null
+            },
+            {
+                "project_name": "Job Placement System",
+                "description": null,
+                "role": null,
+                "duration": null,
+                "link": null
+            },
+            {
+                "project_name": "Flight Management System For Indian Coast Guard",
+                "description": null,
+                "role": null,
+                "duration": null,
+                "link": null
+            }
+        ],
+        "certifications": []
+    }]
 
-    return render_template('score_results.html',  scores_results_lst = gemini_responses_lst22222)
-
+    final_json = get_scores(gemini_responses_lst, jd_data) 
+    cleaned_json = validate_and_clean(final_json) 
+    final_json_lst = cleaned_json
+    print("final_json_lst  : ", final_json_lst)
+ 
+    for final_json in final_json_lst:
+        if isinstance(final_json["final_score"], str):
+            final_json["final_score"] = int(final_json["final_score"]) 
+    final_json_lst.sort(key=lambda x: x["final_score"], reverse=True) 
+    for final_json in final_json_lst:
+        print(f'{final_json["personal_details"]["name"]} : {final_json["final_score"]}')
+                
+    return render_template('score_results.html',  final_json_lst = final_json_lst)
 
 if __name__ == '__main__':
-    app.run(debug=True)
-    # app.run()
+    app.run(debug=True) 

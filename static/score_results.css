@@ -4,10 +4,8 @@ body {
     padding: 0;
     background-color: #ecf0f1;
     padding: 20px 0;
-    overflow-y: scroll; /* Always show vertical scrollbar */
-
-}
-
+    overflow-y: scroll; 
+} 
 /* Navbar styling */
 .navbar {
     width: 100%;
@@ -27,8 +25,7 @@ body {
     font-size: 26px;
     font-weight: bold;
 }
-
-
+ 
 .container {  
     margin: 100px 60px;
     padding: 40px;
@@ -68,7 +65,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #ecf0f1;
+    background-color: #c3efff;
     border-radius: 10px;
     padding: 20px;
     border: 1px solid #ddd;

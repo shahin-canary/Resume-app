@@ -14,20 +14,28 @@
 
     <div class="container">
         <!-- Profile Section (Home) -->
-        {% for scores_results in scores_results_lst %}
+        {% for final_json in final_json_lst %} 
+
         <div class="profile-container"> <!-- Wrapper for each profile -->
             <div class="home-btn-container">
                 <div class="info-box">
                     <div class="name-designation">
-                        <h1>{{ scores_results["personal_details"]["name"] }}</h1>
-                        <h4>{{ scores_results["current_designation"] }}</h4>
+                        {% if final_json["personal_details"]["name"] %}
+                            <h1>{{ final_json["personal_details"]["name"] }}</h1>
+                        {% endif %}
+                        {% if final_json["personal_details"]["current_designation"] %}
+                            <h4>{{ final_json["personal_details"]["current_designation"] }}</h4>
+                        {% endif %}
                     </div>  
                 </div>
                 <div class="total-score-container">
-                    <h3>Score: {{ scores_results["total_score"] }}</h3>
+                    {% if final_json["final_score"] %}
+                        <h3>Score: {{ final_json["final_score"] }}</h3>
+                    {% endif %}
                 </div>
-            </div>
-            
+            </div> 
+ 
+
             <!-- Navigation Buttons for Each Profile -->
             <div class="button-container">
                 <button class="btn" onclick="showSection('personal-details-{{ loop.index }}', this)">Personal Details</button>
@@ -44,92 +52,146 @@
             <div id="personal-details-{{ loop.index }}" class="section">
                 <h2>Personal Details</h2>
                 <ul class="details">
-                    <li><strong>Name:</strong> {{ scores_results["personal_details"]["name"] }}</li>
-                    <li><strong>Email:</strong> {{ scores_results["personal_details"]["email"] }}</li>
-                    <li><strong>Phone:</strong> {{ scores_results["personal_details"]["phone"] }}</li>
-                    <li><strong>Address:</strong> {{ scores_results["personal_details"]["address"] }}</li>
-                    <li><strong>GitHub:</strong> {{ scores_results["personal_details"]["gitHub"] }}</li>
-                    <li><strong>LinkedIn:</strong> {{ scores_results["personal_details"]["linked_in"] }}</li>
-                    <li><strong>StackOverflow:</strong> {{ scores_results["personal_details"]["stack_overflow"] }}</li>
-                    <li><strong>Leetcode:</strong> {{ scores_results["personal_details"]["leetcode"] }}</li>
+                    {% if final_json["personal_details"]["name"] %}
+                        <li><strong>Name:</strong> {{ final_json["personal_details"]["name"] }}</li>
+                    {% endif %}
+                    {% if final_json["personal_details"]["email"] %}
+                        <li><strong>Email:</strong> {{ final_json["personal_details"]["email"] }}</li>
+                    {% endif %}
+                    {% if final_json["personal_details"]["phone"] %}
+                        <li><strong>Phone:</strong> {{ final_json["personal_details"]["phone"] }}</li>
+                    {% endif %}
+                    {% if final_json["personal_details"]["address"] %}
+                        <li><strong>Address:</strong> {{ final_json["personal_details"]["address"] }}</li>
+                    {% endif %}
+                    {% if final_json["personal_details"]["gitHub"] %}
+                        <li><strong>GitHub:</strong> {{ final_json["personal_details"]["gitHub"] }}</li>
+                    {% endif %}
+                    {% if final_json["personal_details"]["linked_in"] %}
+                        <li><strong>LinkedIn:</strong> {{ final_json["personal_details"]["linked_in"] }}</li>
+                    {% endif %}
+                    {% if final_json["personal_details"]["stack_overflow"] %}
+                        <li><strong>StackOverflow:</strong> {{ final_json["personal_details"]["stack_overflow"] }}</li>
+                    {% endif %}
+                    {% if final_json["personal_details"]["leetcode"] %}
+                        <li><strong>Leetcode:</strong> {{ final_json["personal_details"]["leetcode"] }}</li>
+                    {% endif %}
                 </ul>
             </div>
+
 
             <!-- Work Experience Section for Each Profile -->
             <div id="work-experience-{{ loop.index }}" class="section">
                 <h2>Work Experience</h2>
-                {% for work in scores_results["work_experience"] %}
-                    <div>
-                        <h3>{{ work["company"] }} - {{ work["role"] }}</h3>
-                        <p><strong>Duration:</strong> {{ work["duration"] }}</p>
-                        <p><strong>Job Description:</strong> {{ work["job_description"] }}</p>
+                {% for work in final_json["work_experience"] %}
+                    <div class="underline">
+                        {% if work["company"] and work["role"] %}
+                            <h3>{{ work["company"] }} - {{ work["role"] }}</h3>
+                        {% elif work["company"] %}
+                            <h3>{{ work["company"] }}</h3>
+                        {% elif work["role"] %}
+                            <h3>{{ work["role"] }}</h3>
+                        {% endif %}
+                        {% if work["duration"] %}
+                            <p><strong>Duration:</strong> {{ work["duration"] }}</p>
+                        {% endif %}
+                        {% if work["job_description"] %}
+                            <p><strong>Job Description:</strong> {{ work["job_description"] }}</p>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
+
 
             <!-- Additional Sections (Education, Skills, Companies, etc.) for Each Profile -->
             <div id="education-{{ loop.index }}" class="section">
                 <h2>Education</h2>
-                {% for education in scores_results["education"] %}
-                    <div  class="underline">
-                        <p><strong>Degree:</strong> {{ education["degree"] }}</p>
-                        <p><strong>Institution:</strong> {{ education["institution"] }}</p>
-                        <p><strong>Duration:</strong> {{ education["duration"] }}</p>
+                {% for education in final_json["education"] %}
+                    <div class="underline">
+                        {% if education["degree"] %}
+                            <p><strong>Degree:</strong> {{ education["degree"] }}</p>
+                        {% endif %}
+                        {% if education["institution"] %}
+                            <p><strong>Institution:</strong> {{ education["institution"] }}</p>
+                        {% endif %}
+                        {% if education["duration"] %}
+                            <p><strong>Duration:</strong> {{ education["duration"] }}</p>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
+
 
             <div id="skills-{{ loop.index }}" class="section">
                 <h2>Skills</h2>
-                <ul class="skills-list">
-                    {% for skill in scores_results["skills"] %}
-                        <li>{{ skill }}</li>
-                    {% endfor %}
-                </ul>
+                {% if final_json["skills"] %}
+                    <ul class="skills-list">
+                        {% for skill in final_json["skills"] %}
+                            <li>{{ skill }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No skills listed</p>
+                {% endif %}
             </div>
- 
+            
+            
             <div id="projects-{{ loop.index }}" class="section">
                 <h2>Projects</h2>
-                {% for project in scores_results["projects"] %}
+                {% for project in final_json["projects"] %}
                     <div class="underline">
-                        <p><strong>Project Name:</strong> {{ project["project_name"] }}</p>
-                        <p><strong>Description:</strong> {{ project["description"] }}</p>
-                        <p><strong>Role:</strong> {{ project["role"] }}</p>
-                        <p><strong>Duration:</strong> {{ project["duration"] or "N/A" }}</p>
-                        <p><strong>Link:</strong> {{ project["link"] or "N/A" }}</p>
+                        {% if project["project_name"] %}
+                            <p><strong>Project Name:</strong> {{ project["project_name"] }}</p>
+                        {% endif %}
+                        {% if project["description"] %}
+                            <p><strong>Description:</strong> {{ project["description"] }}</p>
+                        {% endif %}
+                        {% if project["role"] %}
+                            <p><strong>Role:</strong> {{ project["role"] }}</p>
+                        {% endif %}
+                        {% if project["duration"] %}
+                            <p><strong>Duration:</strong> {{ project["duration"] }}</p>
+                        {% endif %}
+                        {% if project["link"] %}
+                            <p><strong>Link:</strong> <a href="{{ project['link'] }}" target="_blank">{{ project["link"] }}</a></p>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
 
+                        
             <div id="companies-worked-{{ loop.index }}" class="section">
                 <h2>Companies Worked</h2>
-                <ul class="companies-list">
-                    {% for company in scores_results["companies_worked"] %}
-                        <li>{{ company }}</li>
-                    {% endfor %}
-                </ul>
+                {% if final_json["companies_worked"] %}
+                    <ul class="companies-list">
+                        {% for company in final_json["companies_worked"] %}
+                            <li>{{ company }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No companies listed</p>
+                {% endif %}
             </div>
-
+ 
             <div id="languages-known-{{ loop.index }}" class="section">
                 <h2>Languages Known</h2>
-                <p>
-                    {% if scores_results["languages_known"] %}
-                        <ul>
-                            {% for language in scores_results["languages_known"] %}
-                                <li>{{ language }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>No languages listed</p>
-                    {% endif %}
-                </p>
-            </div> 
+                {% if final_json["languages_known"] %}
+                    <ul>
+                        {% for language in final_json["languages_known"] %}
+                            <li>{{ language }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No languages listed</p>
+                {% endif %}
+            </div>
+
 
             <div id="certifications-{{ loop.index }}" class="section">
                 <h2>Certifications</h2>
-                {% if scores_results["certifications"] %}
+                {% if final_json["certifications"] %}
                     <ul>
-                        {% for certification in scores_results["certifications"] %}
+                        {% for certification in final_json["certifications"] %}
                             <li>{{ certification }}</li>
                         {% endfor %}
                     </ul>
